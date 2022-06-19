@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    kube_version: v1.14.2
+    kube_version: v1.24.2
     etcd_version: v3.5.4
     cri_dockerd_version: v0.2.2
     flanneld_version: v0.18.1
@@ -116,11 +116,12 @@
   - name: Install docker
     apt:
       name:
-        - docker
-        - docker.io
-        - docker-compose
-        - docker-registry
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-compose-plugin
       state: latest
+
 
   - name: Configure tmux
     copy:
@@ -133,3 +134,24 @@
     lineinfile:
       path: /root/.bashrc
       line: "source <(kubectl completion bash)"
+
+  - name: Ensure that /etc/kubernetes exists
+    file:
+      path: /etc/kubernetes
+      state: directory
+      mode: '0755'
+
+  - name: Ensure that /etc/kubernetes/manifests exists
+    file:
+      path: /etc/kubernetes/manifests
+      state: directory
+      mode: '0755'
+
+  - name: Disable swap
+    shell: swapoff -a
+
+  - name: Permanently disable swap
+    lineinfile:
+      path: /etc/fstab
+      regexp: ".*swap.*"
+      state: absent
