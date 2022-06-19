@@ -121,7 +121,7 @@
         - containerd.io
         - docker-compose-plugin
       state: latest
-
+      update_cache: true
 
   - name: Configure tmux
     copy:
