@@ -1,0 +1,135 @@
+- name: Provision demo VM
+  gather_facts: true
+  hosts: all
+  become: true
+
+  vars:
+    kube_version: v1.14.2
+    etcd_version: v3.5.4
+    cri_dockerd_version: v0.2.2
+    flanneld_version: v0.18.1
+    flannel_cni_plugin_version: v1.1.0
+    arch: arm64
+
+  tasks:
+
+  - name: Update apt and install packages
+    apt:
+      pkg:
+        - git
+        - net-tools
+        - vim
+        - golang
+        - make
+        - tmux
+        - bash-completion
+      state: latest
+      update_cache: true
+
+  - name: Download and install kubernetes binaries
+    get_url:
+      url: https://dl.k8s.io/{{ kube_version }}/bin/linux/{{ arch }}/{{ item }}
+      dest: /usr/local/bin/{{ item }}
+      mode: '0755'
+    loop:
+      - kubelet
+      - kube-apiserver
+      - kubectl
+      - kube-proxy
+      - kube-scheduler
+      - kube-controller-manager
+
+  - name: Download etcd
+    get_url:
+      url: https://github.com/etcd-io/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-{{ arch }}.tar.gz
+      dest: /tmp/etcd-{{ etcd_version }}-linux-{{ arch }}.tar.gz
+
+  - name: Extract etcd
+    unarchive:
+      src: /tmp/etcd-{{ etcd_version }}-linux-{{ arch }}.tar.gz
+      dest: /tmp
+      creates: /tmp/etcd-{{ etcd_version }}-linux-{{ arch }}
+      remote_src: true
+
+  - name: Install etcd binaries
+    copy:
+      src: /tmp/etcd-{{ etcd_version }}-linux-{{ arch }}/{{ item }}
+      dest: /usr/local/bin/{{ item }}
+      mode: "0755"
+      remote_src: true
+    loop:
+      - etcd
+      - etcdctl
+      - etcdutl
+
+  - name: Checkout cri-dockerd
+    git:
+      repo: https://github.com/Mirantis/cri-dockerd.git
+      dest: /tmp/cri-dockerd
+      version: "{{ cri_dockerd_version }}"
+      force: true
+
+  - name: Build and install cri-dockerd
+    shell:
+      cmd: go get && go build -o /usr/local/bin/cri-dockerd
+      creates: /usr/local/bin/cri-dockerd
+      chdir: /tmp/cri-dockerd
+
+  - name: Download and install flanneld
+    get_url:
+      url: https://github.com/flannel-io/flannel/releases/download/{{ flanneld_version }}/flanneld-{{ arch }}
+      dest: /usr/local/bin/flanneld
+      mode: '0755'
+
+  - name: Ensure that CNI plugin directory exists
+    file:
+      path: /opt/cni/bin
+      state: directory
+      mode: '0755'
+
+  - name: Download and install flannel CNI plugin
+    get_url:
+      url: https://github.com/flannel-io/cni-plugin/releases/download/{{ flannel_cni_plugin_version }}/flannel-{{ arch }}
+      dest: /opt/cni/bin/flannel
+      mode: '0755'
+
+  - name: Install prerequesites for docker
+    apt:
+      pkg:
+        - ca-certificates
+        - curl
+        - gnupg
+        - lsb-release
+      state: latest
+
+  - name: Add docker signing key
+    apt_key:
+      url: "https://download.docker.com/linux/debian/gpg"
+      state: present
+
+  - name: Add docker repo to apt sources
+    apt_repository:
+      repo: "deb [arch={{ arch }}] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+      state: present
+      filename: docker
+
+  - name: Install docker
+    apt:
+      name:
+        - docker
+        - docker.io
+        - docker-compose
+        - docker-registry
+      state: latest
+
+  - name: Configure tmux
+    copy:
+      dest: /root/.tmux.conf
+      content: |
+        set -g prefix C-a
+        bind-key C-a send-prefix
+
+  - name: Configure kubectl autocompletion
+    lineinfile:
+      path: /root/.bashrc
+      line: "source <(kubectl completion bash)"
