@@ -1,7 +1,6 @@
 #!/bin/bash
 
-openssl \
-    req \
+openssl req \
     -x509 \
     -newkey rsa:4096 \
     -nodes \
