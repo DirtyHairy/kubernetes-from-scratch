@@ -57,7 +57,7 @@
 ### All is well again: seamless networking over two nodes
 
 
-## 7. Is there anybody out there? Service discovery? Cluster DNS
+## 7. Is there anybody out there? Service discovery & Cluster DNS
 
 ### Setup CoreDNS
 
