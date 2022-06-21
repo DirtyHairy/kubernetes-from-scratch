@@ -9,6 +9,7 @@
     cri_dockerd_version: v0.2.2
     flanneld_version: v0.18.1
     flannel_cni_plugin_version: v1.1.0
+    cni_plugins_version: v1.1.1
     arch: arm64
 
   tasks:
@@ -38,6 +39,7 @@
       - kube-proxy
       - kube-scheduler
       - kube-controller-manager
+      - kubeadm
 
   - name: Download etcd
     get_url:
@@ -93,6 +95,18 @@
       dest: /opt/cni/bin/flannel
       mode: '0755'
 
+  - name: Download core CNI plugins
+    get_url:
+      url: https://github.com/containernetworking/plugins/releases/download/{{ cni_plugins_version }}/cni-plugins-linux-{{ arch }}-{{ cni_plugins_version }}.tgz
+      dest: /tmp/cni-plugins-linux-{{ arch }}-{{ cni_plugins_version }}.tgz
+
+  - name: Extract and install core CNI plugins
+    unarchive:
+      src: /tmp/cni-plugins-linux-{{ arch }}-{{ cni_plugins_version }}.tgz
+      dest: /opt/cni/bin
+      creates: /opt/cni/bin/portmap,
+      remote_src: true
+
   - name: Install prerequesites for docker
     apt:
       pkg:
@@ -130,6 +144,11 @@
         set -g prefix C-a
         bind-key C-a send-prefix
 
+  - name: Setup KUBECONFIG
+    lineinfile:
+      path: /root/.bashrc
+      line: "export KUBECONFIG=/etc/kubernetes/kubeconfig.yaml"
+
   - name: Configure kubectl autocompletion
     lineinfile:
       path: /root/.bashrc
@@ -144,6 +163,12 @@
   - name: Ensure that /etc/kubernetes/manifests exists
     file:
       path: /etc/kubernetes/manifests
+      state: directory
+      mode: '0755'
+
+  - name: Ensure that /etc/cni/net.d exists
+    file:
+      path: /etc/cni/net.d
       state: directory
       mode: '0755'
 
