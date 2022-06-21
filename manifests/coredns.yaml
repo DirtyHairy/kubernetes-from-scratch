@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+data:
+  Corefile: |
+    .:53 {
+      bind 0.0.0.0
+      loadbalance
+      kubernetes cluster.local {
+          endpoint 10.10.0.10
+          kubeconfig /etc/kubernetes/kubeconfig.yaml
+          fallthrough in-addr.arpa ip6.arpa
+      }
+      forward . 8.8.8.8:53
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredns
+  labels:
+    app: coredns
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: coredns
+  template:
+    metadata:
+      labels:
+        app: coredns
+    spec:
+      priorityClassName: system-cluster-critical
+      containers:
+      - name: coredns
+        image: coredns/coredns:1.9.3
+        imagePullPolicy: IfNotPresent
+        args: [ "-conf", "/etc/coredns/Corefile" ]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/coredns
+          readOnly: true
+        - name: kubeconfig
+          mountPath: /etc/kubernetes
+        ports:
+        - containerPort: 53
+          name: dns
+          protocol: UDP
+        - containerPort: 53
+          name: dns-tcp
+          protocol: TCP
+      dnsPolicy: Default
+      volumes:
+        - name: config-volume
+          configMap:
+            name: coredns
+            items:
+            - key: Corefile
+              path: Corefile
+        - name: kubeconfig
+          hostPath:
+            path: /etc/kubernetes
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredns
+  labels:
+    app: coredns
+spec:
+  selector:
+    app: coredns
+  clusterIP: 10.1.1.2
+  ports:
+  - name: dns
+    port: 53
+    protocol: UDP
+  - name: dns-tcp
+    port: 53
+    protocol: TCP

@@ -24,6 +24,7 @@
         - make
         - tmux
         - bash-completion
+        - conntrack
       state: latest
       update_cache: true
 
