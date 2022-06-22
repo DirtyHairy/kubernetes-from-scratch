@@ -6,7 +6,7 @@ kube-apiserver \
   --service-cluster-ip-range=10.1.0.0/16 \
   --bind-address=0.0.0.0 \
   --authorization-mode=AlwaysAllow \
-  --enable-admission-plugins=ServiceAccount \
+  --disable-admission-plugins=ServiceAccount \
   --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname \
   --token-auth-file /etc/kubernetes/token.txt \
   --service-account-key-file /etc/kubernetes/service-account.pem \
