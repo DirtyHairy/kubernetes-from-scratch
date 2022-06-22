@@ -181,3 +181,9 @@
       path: /etc/fstab
       regexp: ".*swap.*"
       state: absent
+
+  - name: Pull nginx docker image
+    shell: docker pull nginx:latest
+
+  - name: Pull coredns docker image
+    shell: docker pull coredns/coredns:1.9.3
