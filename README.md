@@ -1,9 +1,40 @@
 # What is this?
 
+This is the infrastructure and material for my talk "Kubernetes from Scratch".
+It gives you two VMs that are provisioned to work as a lab for setting up
+a simple Kubernetes clust with two nodes.
+
 # Prerequesites
 
-# Kubernetes from scratch
+The VMs are based on Debian Bullseye and are managed with vagrant. I am using
+an Apple Silicon Mac, so the `Vagrantfile` is written for Parallels and uses a
+custom built arm64 Bullseye box, but you should be able to swap in any other
+provider and (Bullseye) box at your leasure. However, **do not change** the
+IPs that are assigned to the hostonly interfaces without changing the cluster
+configuration accordingly.
 
+The VMs are provisioned with Ansible. The corresponding `playbook.yaml` is set
+up to install all required dependencies (and a few more for convenience) and
+prepares the nodes for following through the steps of this talk. Again, the
+playbook pulls in the arm64 versions of all packages, but you should be able
+to apply this to any other architecture by changing the `arch` variable.
+
+For the talk I ssh into the machines with `vagrant ssh`, `sudo bash` to root
+and then run everything inside a `tmux` session for convenience. Also, I `source`
+the shell scripts (rather than executing them) as a convenient way to have
+the name of the daemon in the tmux tab. I source the  `setup.sh` script on order
+to access the cluster with `kubectl` running on the host.
+
+# WARNING
+
+This is a lab for experimenting with Kubernetes. All configuration has been
+chosen to be a simple as possible, not to be suited for production. In particular,
+the cluster does not have any security configured, everything has full permissions
+to mess with everything else.
+
+**DO NOT EVEN THINK OF USING THIS FOR PRODUCTION.**
+
+# Kubernetes from scratch
 
 ## 1. The foundation: container runtime & kubelet
 
