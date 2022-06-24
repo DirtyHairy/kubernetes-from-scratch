@@ -25,6 +25,7 @@
         - tmux
         - bash-completion
         - conntrack
+        - bridge-utils
       state: latest
       update_cache: true
 
@@ -145,31 +146,20 @@
         set -g prefix C-a
         bind-key C-a send-prefix
 
-  - name: Setup KUBECONFIG
-    lineinfile:
-      path: /root/.bashrc
-      line: "export KUBECONFIG=/etc/kubernetes/kubeconfig.yaml"
-
   - name: Configure kubectl autocompletion
     lineinfile:
       path: /root/.bashrc
       line: "source <(kubectl completion bash)"
 
-  - name: Ensure that /etc/kubernetes exists
-    file:
-      path: /etc/kubernetes
-      state: directory
-      mode: '0755'
+  - name: Configure kubectl autocompletion
+    lineinfile:
+      path: /root/.bashrc
+      regexp: .*KUBECONFIG.*
+      line: "export KUBECONFIG=/vagrant/config/kubeconfig.yaml"
 
   - name: Ensure that /etc/kubernetes/manifests exists
     file:
       path: /etc/kubernetes/manifests
-      state: directory
-      mode: '0755'
-
-  - name: Ensure that /etc/cni/net.d exists
-    file:
-      path: /etc/cni/net.d
       state: directory
       mode: '0755'
 

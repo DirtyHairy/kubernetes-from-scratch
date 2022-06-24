@@ -1,3 +1,3 @@
 #!/bin/bash
 
-kube-controller-manager --kubeconfig /etc/kubernetes/kubeconfig.yaml
+kube-controller-manager --kubeconfig /vagrant/config/kubeconfig.yaml

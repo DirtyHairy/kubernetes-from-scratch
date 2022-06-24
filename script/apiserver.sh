@@ -8,7 +8,7 @@ kube-apiserver \
     --authorization-mode=AlwaysAllow \
     --disable-admission-plugins=ServiceAccount \
     --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname \
-    --token-auth-file /etc/kubernetes/token.txt \
-    --service-account-key-file /etc/kubernetes/service-account.pem \
-    --service-account-signing-key-file /etc/kubernetes/service-account-key.pem \
+    --token-auth-file /vagrant/config/token.txt \
+    --service-account-key-file /vagrant/config/cert/service-account.pem \
+    --service-account-signing-key-file /vagrant/config/cert/service-account-key.pem \
     --service-account-issuer api

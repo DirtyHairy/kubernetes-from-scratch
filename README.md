@@ -87,28 +87,10 @@ Launch `etcd`:
 
 ### Launch kube-apiserver
 
-Generate certificate for signing  service accounts:
-
-```
-    $ source /vagrant/script/create-service-account-cert.sh
-```
-
-Copy static token file:
-
-```
-    $ cp /vagrant/config/token.txt /etc/kubernetes
-```
-
 Launch `kube-apiserver`
 
 ```
     $ source /vagrant/script/apiserver.sh
-```
-
-Copy kubeconfig
-
-```
-    $ cp /vagrant/config/kubeconfig.yaml /etc/kubernetes
 ```
 
 Relaunch `kubelet` with kubeconfig:
@@ -243,11 +225,9 @@ Write the flanneld config to etcd:
     $ source /vagrant/script/etcd-flannel-config.sh
 ```
 
-On each node, copy the flannel plugin config to `/etc/cni/net.d`, launch flanneld and
-restart the services:
+On each node, launch flanneld and restart the services:
 
 ```
-    $ cp /vagrant/config/10-flannel.conflist /etc/cni/net.d
     $ source /vagrant/script/flanneld.sh
     $ source /vagrant/script/cri-dockerd-cni.sh
     $ source /vagrant/script/kubelet.sh

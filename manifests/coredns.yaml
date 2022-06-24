@@ -64,7 +64,7 @@ spec:
               path: Corefile
         - name: kubeconfig
           hostPath:
-            path: /etc/kubernetes
+            path: /vagrant/config
 ---
 apiVersion: v1
 kind: Service

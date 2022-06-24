@@ -1,3 +1,3 @@
 #!/bin/bash
 
-kube-scheduler --kubeconfig /etc/kubernetes/kubeconfig.yaml
+kube-scheduler --kubeconfig /vagrant/config/kubeconfig.yaml

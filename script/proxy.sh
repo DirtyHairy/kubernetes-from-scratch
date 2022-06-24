@@ -1,3 +1,3 @@
 #!/bin/bash
 
-kube-proxy --kubeconfig /etc/kubernetes/kubeconfig.yaml
+kube-proxy --kubeconfig /vagrant/config/kubeconfig.yaml
