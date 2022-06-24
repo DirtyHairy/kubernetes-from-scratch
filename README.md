@@ -2,7 +2,7 @@
 
 This is the infrastructure and material for my talk "Kubernetes from Scratch".
 It gives you two VMs that are provisioned to work as a lab for setting up
-a simple Kubernetes clust with two nodes.
+a simple Kubernetes cluster with two nodes.
 
 # Prerequesites
 
