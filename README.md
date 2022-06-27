@@ -6,7 +6,7 @@ a simple Kubernetes cluster with two nodes.
 
 # Prerequesites
 
-The VMs are based on Debian Bullseye and are managed with vagrant. I am using
+The VMs are based on Debian Bullseye and are managed with Vagrant. I am using
 an Apple Silicon Mac, so the `Vagrantfile` is written for Parallels and uses a
 custom built arm64 Bullseye box, but you should be able to swap in any other
 provider and (Bullseye) box at your leasure. However, **do not change** the
